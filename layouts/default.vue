@@ -1,10 +1,18 @@
 <template>
   <div>
+    <header>
+      <h1>
+        <a href="/type">Hey there! 電源カフェ</a>
+      </h1>
+      <nav class="pc-nav">
+        <select>都市選択</select>
+      </nav>
+    </header>
     <nuxt/>
   </div>
 </template>
 
-<style>
+<style lang="scss">
 html {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
@@ -14,6 +22,23 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: "Hiragino Kaku Gothic Pro", "ヒラギノ角ゴ Pro W3", メイリオ, Meiryo, "ＭＳ Ｐゴシック", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    // background-color: #e6e6e6;
+    header {
+      width: 100%;
+      padding: 30px 10% 10px;
+      background-color: #fff;
+      position: fixed;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
 }
 
 *, *:before, *:after {
@@ -48,6 +73,10 @@ html {
 .button--grey:hover {
   color: #fff;
   background-color: #35495e;
+}
+
+img {
+  margin: 0 0;
 }
 </style>
 
