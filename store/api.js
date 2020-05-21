@@ -1,5 +1,5 @@
 import axios from 'axios'
-import apiEndpoint from '../gurunavi_api'
+import apiEndpoint from '../third_party_api'
 
 // export const api = {
 //   namespaced: true,
@@ -9,7 +9,6 @@ import apiEndpoint from '../gurunavi_api'
 // }
 export const actions = {
   apiRequest(context, reqData) {
-    console.log('req', reqData)
     return new Promise(resolve => {
       const req = {}
       req.timeout = 10000

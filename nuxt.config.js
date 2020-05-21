@@ -23,12 +23,18 @@ module.exports = {
     proxy: true
   },
   proxy: {
-    '/api': {
+    '/gurunavi': {
       target: 'https://api.gnavi.co.jp',
       pathRewrite: {
-        '^/api': ''
+        '^/gurunavi': ''
       }
-    }
+    },
+    '/geo': {
+      target: 'http://geoapi.heartrails.com',
+      pathRewrite: {
+        '^/geo': ''
+      }
+    },
   },
   /*
   ** Customize the progress bar color

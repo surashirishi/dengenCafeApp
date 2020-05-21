@@ -1,39 +1,28 @@
 
 <template>
   <div class="container">
-    <h1>カフェのindexページ</h1>
-    <sui-grid :columns="4">
-      <sui-grid-column v-for="(rest, index) in restaurantList" :key="index" class="content-card">
-        <sui-card class="fluid">
-      <!-- <div v-for="(rest, index) in restaurantList" :key="index" class="content-card"> -->
-        <!-- <sui-card> -->
-          <sui-card-content>
-            <sui-image
-              :src="rest.image_url.shop_image1"
-              shape="circular"
-              size="mini"
-            />
-            {{rest.name}}
-            <sui-card-meta slot="right">14h</sui-card-meta>
-          </sui-card-content>
-          <sui-image :src="rest.image_url.shop_image1" />
-          <sui-card-content>
-            <span slot="right"> <sui-icon name="heart outline" /> 17 likes </span>
-            <sui-icon name="comment" /> 3 comments
-          </sui-card-content>
-          <sui-card-content extra>
-            <sui-input
-              placeholder="Add Comment"
-              icon="heart outline"
-              icon-position="left"
-              transparent
-            />
-          </sui-card-content>
-        </sui-card>
-      <!-- </div> -->
-    <!-- </div> -->
-      </sui-grid-column>
-    </sui-grid>
+    <div
+      v-for="(rest, index) in restaurantList" :key="index"
+      class="content"
+    >
+    <div class="content-image">
+      <div class="ribbon-wrapper">
+        <div class="ribbon">
+          <h3>{{rest.name}}</h3>
+        </div>
+      </div>
+      <img :src="rest.image_url.shop_image1" alt="restaurant image" width="300px" height="300px">
+    </div>
+    <div class="content-detail">
+      <div class="content-detail-instance">最寄り駅：{{rest.access.station}} (徒歩 {{rest.access.walk}} 分）</div>
+      <div class="content-detail-instance">住所 : {{rest.address}}</div>
+      <div class="content-detail-instance">クレジットカード：{{useCreditCard(rest.credit_card)}}{{rest.credit_card}}</div>
+      <div class="content-detail-instance">休日：{{rest.holiday}}</div>
+      <div class="content-detail-instance">詳細：{{rest.pr.pr_short}}</div>
+      <div class="content-detail-instance">TEL：{{rest.tel}}</div>
+      <a class="content-detail-instance" :href="rest.url" target="_blank">URL：{{rest.url}}</a>
+    </div>
+    </div>
   </div>
 </template>
 
@@ -42,31 +31,169 @@ import SuiVue from 'semantic-ui-vue';
 export default {
   data() {
     return {
+      isLoading: true,
       restaurantList: [],
+      latitude: 0,
+      longitude: 0
     }
   },
+  created() {
+    this.getLocation()
+  },
   mounted() {
-    this.getRestaurantIndex()
+    // this.getRestaurantIndex()
+    // this.isLoading = false
+  },
+  computed: {
   },
   methods: {
-    getRestaurantIndex() {
+    getLocation () {
+      if (process.client) {
+        if (!navigator.geolocation) {
+          alert('現在地情報を取得できませんでした。お使いのブラウザでは現在地情報を利用できない可能性があります。エリアを入力してください。')
+          return
+        }
+        const options = {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        }
+        navigator.geolocation.getCurrentPosition(this.success, this.error, options)
+      }
+    },
+    success (position) {
+      this.getRestaurantIndex(position.coords.latitude, position.coords.longitude)
+    },
+    error (error) {
+      switch (error.code) {
+        case 1: //PERMISSION_DENIED
+          alert('位置情報の利用が許可されていません')
+          break
+        case 2: //POSITION_UNAVAILABLE
+          alert('現在位置が取得できませんでした')
+          break
+        case 3: //TIMEOUT
+          // alert('タイムアウトになりました')
+          break
+        default:
+          alert('現在位置が取得できませんでした')
+          break
+      }
+    },
+    getRestaurantIndex(latitude, longitude) {
       this.$store.dispatch('api/apiRequest', {
-        api: 'index',
+        api: 'restaurantIndex',
         params: {
           keyid: 'ee16c358353c48730bc3264ead7330a7',
           freeword: 'カフェ',
+          latitude: latitude,
+          longitude: longitude,
         },
       }).then((res) => {
         this.restaurantList = res.rest
         console.log(this.restaurantList)
       })
-    }
+    },
+    useCreditCard(credit_card) {
+      return credit_card.length > 0 ? '可  ' : '不可'
+    },
   }
 }
 </script>
 <style lang="scss">
-.fluid {
-  height: 400px;
+.container {
+  margin: 80px auto;
+  // position: relative;
+  // background-color: blue;
+  .content {
+    width: 80%;
+    height: 400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    // color: #668ad8;/*文字色*/
+    border-top: dashed 2px #668ad8;/*破線 太さ 色*/
+    background: #f1f8ff; /*背景色*/
+    padding: 0.5em 0.5em 0.5em 2em;
+    &-image {
+      position: relative;
+    .ribbon-wrapper {
+      position: absolute;
+      top: 4px;
+      padding: 2px 0;
+      width: 300px;
+      background: #f1f1f1;
+      .ribbon {
+        display: inline-block;
+        position: relative;
+        box-sizing: border-box;
+        padding: 5px 0;
+        margin: 0 0 0 -20px;
+        width: calc(100% + 20px);
+        color: white;
+        background: #70a6ff;
+        box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+        h3{
+          margin: 0;
+          padding: 0 30px 0 16px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          border-top: dashed 1px #FFF;
+          border-bottom: dashed 1px #FFF;
+          font-size: 20px;
+          line-height: 46px;
+        }
+        &:after {
+          position: absolute;
+          content: '';
+          z-index: 1;
+          top: 0;
+          right: 0;
+          width: 0px;
+          height: 0px;
+          border-width: 30px 15px 30px 0px;
+          border-color: transparent #f1f1f1 transparent transparent;
+          border-style: solid;
+        }
+        &:before {
+          position: absolute;
+          content: '';
+          top: 100%;
+          left: 0;
+          border: none;
+          border-bottom: solid 15px transparent;
+          border-right: solid 20px #6081b7;
+        }
+      }
+
+
+      }
+
+      width: 30%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      img {
+        border-radius: 15px;
+        width: 300px;
+        height: 300px;
+      }
+    }
+    &-detail {
+      width: 70%;
+      height: 300px;
+      &-instance {
+        margin: 12px;
+        padding: 4px;
+        border-left: solid 6px #2d8fdd;
+      }
+    }
+    .rest-name {
+
+    }
+  }
 }
 </style>
 
