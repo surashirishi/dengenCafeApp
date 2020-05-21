@@ -13,6 +13,21 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
   },
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/proxy'
+  ],
+  axios: {
+    proxy: true
+  },
+  proxy: {
+    '/api': {
+      target: 'https://api.gnavi.co.jp',
+      pathRewrite: {
+        '^/api': ''
+      }
+    }
+  },
   /*
   ** Customize the progress bar color
   */
