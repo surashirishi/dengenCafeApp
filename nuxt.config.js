@@ -15,7 +15,9 @@ module.exports = {
   },
   modules: [
     '@nuxtjs/axios',
-    '@nuxtjs/proxy'
+    '@nuxtjs/proxy',
+    'semantic-ui-vue/nuxt', // includes styles from semantic-ui-css
+    ['semantic-ui-vue/nuxt', { css: false }], // if you have your own semantic-ui styles
   ],
   axios: {
     proxy: true
