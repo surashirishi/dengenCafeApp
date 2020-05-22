@@ -15,8 +15,19 @@
       </nav>
     </header>
     <nuxt/>
+    <!-- ダイアログ -->
+    <modal />
   </div>
 </template>
+<script>
+import Modal from '~/components/Modal.vue'
+
+export default {
+  components: {
+    Modal
+  },
+}
+</script>
 
 <style lang="scss">
 html {
@@ -43,6 +54,9 @@ html {
       display: flex;
       align-items: center;
       justify-content: space-between;
+    }
+    .container {
+      margin: 100px auto;
     }
   }
 }

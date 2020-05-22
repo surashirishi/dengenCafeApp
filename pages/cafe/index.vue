@@ -1,43 +1,45 @@
 
 <template>
-  <div class="container" v-if="!notFoundRestaurant">
+  <div class="container" v-if="!notFoundCount < 2">
     <div
       v-for="(rest, index) in restaurantList" :key="index"
       class="content"
     >
-    <div class="content-image">
-      <div class="ribbon-wrapper">
-        <div class="ribbon">
-          <h3>{{rest.name}}</h3>
+      <div class="content-image">
+        <div class="ribbon-wrapper">
+          <div class="ribbon">
+            <h3>{{rest.name}}</h3>
+          </div>
         </div>
+        <img
+          v-if="rest.image_url.shop_image1 !== ''"
+          :src="rest.image_url.shop_image1"
+          alt="restaurant image"
+          width="300px"
+          height="300px"
+        >
+        <img
+          v-else
+          src="~/assets/images/noimage.png"
+          alt="restaurant no-image"
+          width="300px"
+          height="300px"
+        >
       </div>
-      <img
-        v-if="rest.image_url.shop_image1 !== ''"
-        :src="rest.image_url.shop_image1"
-        alt="restaurant image"
-        width="300px"
-        height="300px"
-      >
-      <img
-        v-else
-        src="~/assets/images/noimage.png"
-        alt="restaurant no-image"
-        width="300px"
-        height="300px"
-      >
-    </div>
-    <div class="content-detail">
-      <div class="content-detail-instance">最寄り駅：{{rest.access.station}} (徒歩 {{rest.access.walk}} 分）</div>
-      <div class="content-detail-instance">住所 : {{rest.address}}</div>
-      <div class="content-detail-instance">クレジットカード：{{useCreditCard(rest.credit_card)}}{{rest.credit_card}}</div>
-      <div class="content-detail-instance">休日：{{rest.holiday}}</div>
-      <div class="content-detail-instance">詳細：{{rest.pr.pr_short}}</div>
-      <div class="content-detail-instance">TEL：{{rest.tel}}</div>
-      <div class="content-detail-instance"><a :href="rest.url" target="_blank">URL：{{rest.url}}</a></div>
-    </div>
+      <div class="content-detail">
+        <div class="content-detail-instance">最寄り駅：{{rest.access.station}} (徒歩 {{rest.access.walk}} 分）</div>
+        <div class="content-detail-instance">住所 : {{rest.address}}</div>
+        <div class="content-detail-instance">クレジットカード：{{useCreditCard(rest.credit_card)}}{{rest.credit_card}}</div>
+        <div class="content-detail-instance">休日：{{rest.holiday}}</div>
+        <div class="content-detail-instance">詳細：{{rest.pr.pr_short}}</div>
+        <div class="content-detail-instance">TEL：{{rest.tel}}</div>
+        <div class="content-detail-instance"><a :href="rest.url" target="_blank">URL：{{rest.url}}</a></div>
+        <div class="content-detail-footer" @click="setModal(rest.id)">詳細を確認する</div>
+      </div>
     </div>
   </div>
   <div class="container" v-else>
+    {{notFoundCount}}
     <div class="content">
       <h1>
         現在地から市町村を取得します。
@@ -47,12 +49,12 @@
 </template>
 
 <script>
-import SuiVue from 'semantic-ui-vue';
 export default {
   data() {
     return {
       isLoading: true,
       notFoundRestaurant: false,
+      notFoundCount: 0,
       restaurantList: [],
       latitude: 0,
       longitude: 0,
@@ -60,7 +62,14 @@ export default {
     }
   },
   created() {
+    console.log('env', process.env.GURUNAVI_KEY)
     this.getLocation()
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.$nuxt.$loading.start()
+      setTimeout(() => this.$nuxt.$loading.finish(), 500)
+    })
   },
   computed: {
   },
@@ -108,51 +117,69 @@ export default {
           y: this.latitude
         }
       }).then((res) => {
-        this.cityGetbyManually = res.response.location[0].city
-        this.getRestaurantIndex()
+        if (res) {
+          this.cityGetbyManually = res.response.location[0].city
+          this.getRestaurantIndex()
+        }
       })
     },
     getRestaurantIndex() {
+      if (this.notFoundCount > 2) {
+        this.notFoundCount = 0
+        this.$router.push('/error')
+        return
+      }
       let params = {}
       // 緯度・経度から店舗が見つからなかった場合には、市町村を取得し再検索
       if(this.notFoundRestaurant) {
         params = {
-          keyid: 'ee16c358353c48730bc3264ead7330a7',
+          keyid: process.env.GURUNAVI_KEY,
           freeword: 'カフェ',
-          address: this.cityGetbyManually
+          address: this.cityGetbyManually,
+          wifi: 1
         }
       } else {
         params = {
-          keyid: 'ee16c358353c48730bc3264ead7330a7',
+          keyid: process.env.GURUNAVI_KEY,
           freeword: 'カフェ',
           latitude: this.latitude,
-          longitude: this.longitude
+          longitude: this.longitude,
+          wifi: 1
         }
       }
-      console.log('param', this.params)
       this.$store.dispatch('api/apiRequest', {
         api: 'restaurantIndex',
         params: params
       }).then((res) => {
         this.restaurantList = res.rest
         this.notFoundRestaurant = false
-        console.log('rest', this.restaurantList)
+        this.notFoundCount = 0
       }).catch((err) => {
         this.notFoundRestaurant = true
+        this.notFoundCount += 1
         this.getCurrentCity()
       })
     },
     useCreditCard(credit_card) {
       return credit_card.length > 0 ? '可  ' : '不可'
     },
+    setModal(shop_id) {
+      this.$store.dispatch('api/apiRequest', {
+        api: 'restaurantIndex',
+        params: {
+          keyid: process.env.GURUNAVI_KEY,
+          id: shop_id
+        }
+      }).then((shopinfo) => {
+        this.$store.commit('api/setShopInfo', shopinfo)
+        this.$store.commit('modal/setModalState', true)
+      })
+    }
   }
 }
 </script>
 <style lang="scss">
 .container {
-  margin: 80px auto;
-  // position: relative;
-  // background-color: blue;
   .content {
     width: 80%;
     height: 400px;
@@ -160,9 +187,8 @@ export default {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    // color: #668ad8;/*文字色*/
-    border-top: dashed 2px #668ad8;/*破線 太さ 色*/
-    background: #f1f8ff; /*背景色*/
+    border-top: dashed 2px #668ad8;
+    background: #f1f8ff;
     padding: 0.5em 0.5em 0.5em 2em;
 
     &-image {
@@ -237,9 +263,15 @@ export default {
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-    }
-    .rest-name {
-
+      &-footer {
+        color: #668ad8;/*文字色*/
+        font-size: 1.2em;;
+        font-weight: bold;
+        cursor: pointer;
+        &:after {
+          content: '＞＞'
+        }
+      }
     }
   }
 }

@@ -7,6 +7,20 @@ import apiEndpoint from '../third_party_api'
 //   mutations: {},
 //   getters: {},
 // }
+export const state = () => ({
+  shopInfo: {}
+})
+export const mutations = {
+  setShopInfo(state, shopInfo) {
+    state.shopInfo = shopInfo
+    console.log(state.shopInfo)
+  }
+}
+export const getters = {
+  getShopInfo (state) {
+    return state.shopInfo
+  }
+}
 export const actions = {
   apiRequest(context, reqData) {
     return new Promise((resolve, reject) => {
