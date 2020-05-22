@@ -9,7 +9,7 @@ import apiEndpoint from '../third_party_api'
 // }
 export const actions = {
   apiRequest(context, reqData) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       const req = {}
       req.timeout = 10000
       if (apiEndpoint[reqData.api].method === 'post') {
@@ -26,6 +26,8 @@ export const actions = {
       }
       axios(req).then(response => {
         resolve(response.data)
+      }).catch((error) => {
+        reject(error)
       })
     })
   },

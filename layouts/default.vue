@@ -5,7 +5,13 @@
         <a href="/type">Hey there! 電源カフェ</a>
       </h1>
       <nav class="pc-nav">
-        <select>都市選択</select>
+        <select name="都市選択">
+          <option value="都市選択">選択してください</option>
+          <option value="新宿区">A型</option>
+          <option value="B">B型</option>
+          <option value="O">O型</option>
+          <option value="AB">AB型</option>
+        </select>
       </nav>
     </header>
     <nuxt/>
