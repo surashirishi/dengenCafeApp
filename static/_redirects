@@ -1,0 +1,3 @@
+/gurunavi/*  https://api.gnavi.co.jp/:splat  200
+/geo/*  http://geoapi.heartrails.com/:splat  200
+/*    /index.html   200
