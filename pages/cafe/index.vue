@@ -1,11 +1,11 @@
 
 <template>
-  <div class="container" v-if="!notFoundCount < 2">
+  <div class="container" v-if="!notFoundCount < 2 && $store.getters['api/getRestaurantList'].restaurantList">
     <div
-      v-for="(rest, index) in restaurantList" :key="index"
+      v-for="(rest, index) in $store.getters['api/getRestaurantList'].restaurantList" :key="index"
       class="content"
     >
-      <div class="content-image">
+      <div class="content-image" @click="setModal(rest.id)">
         <div class="ribbon-wrapper">
           <div class="ribbon">
             <h3>{{rest.name}}</h3>
@@ -39,7 +39,6 @@
     </div>
   </div>
   <div class="container" v-else>
-    {{notFoundCount}}
     <div class="content">
       <h1>
         現在地から市町村を取得します。
@@ -55,20 +54,21 @@ export default {
       isLoading: true,
       notFoundRestaurant: false,
       notFoundCount: 0,
-      restaurantList: [],
       latitude: 0,
       longitude: 0,
       cityGetbyManually: ''
     }
   },
   created() {
-    console.log('env', process.env.GURUNAVI_KEY)
     this.getLocation()
   },
   mounted() {
     this.$nextTick(() => {
       this.$nuxt.$loading.start()
-      setTimeout(() => this.$nuxt.$loading.finish(), 500)
+      if(this.notFoundCount < 2 && this.$store.getters['api/getRestaurantList'].restaurantList) {
+        this.$router.push('/error')
+      }
+      setTimeout(() => this.$nuxt.$loading.finish(), 5000)
     })
   },
   computed: {
@@ -151,7 +151,8 @@ export default {
         api: 'restaurantIndex',
         params: params
       }).then((res) => {
-        this.restaurantList = res.rest
+        this.$store.commit('api/setRestaurantList', res.rest)
+        // this.restaurantList = res.rest
         this.notFoundRestaurant = false
         this.notFoundCount = 0
       }).catch((err) => {
@@ -179,6 +180,7 @@ export default {
 }
 </script>
 <style lang="scss">
+@import 'assets/scss/color.scss';
 .container {
   .content {
     width: 80%;
@@ -188,7 +190,7 @@ export default {
     justify-content: flex-start;
     align-items: center;
     border-top: dashed 2px #668ad8;
-    background: #f1f8ff;
+    background: $base;
     padding: 0.5em 0.5em 0.5em 2em;
 
     &-image {
@@ -197,6 +199,7 @@ export default {
       display: flex;
       justify-content: center;
       align-items: center;
+      cursor: pointer;
       img {
         border-radius: 15px;
       }
@@ -222,8 +225,8 @@ export default {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            border-top: dashed 1px #FFF;
-            border-bottom: dashed 1px #FFF;
+            border-top: dashed 1px $site;
+            border-bottom: dashed 1px $site;
             font-size: 20px;
             line-height: 46px;
           }
@@ -246,7 +249,7 @@ export default {
             left: 0;
             border: none;
             border-bottom: solid 15px transparent;
-            border-right: solid 20px #6081b7;
+            border-right: solid 20px $main;
           }
         }
       }
@@ -258,13 +261,13 @@ export default {
         height: 28px;
         margin: 12px;
         padding: 4px;
-        border-left: solid 6px #2d8fdd;
+        border-left: solid 6px $strong;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
       &-footer {
-        color: #668ad8;/*文字色*/
+        color: $main;
         font-size: 1.2em;;
         font-weight: bold;
         cursor: pointer;

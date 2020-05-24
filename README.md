@@ -1,4 +1,4 @@
-# hopestore-app
+# dengenCafeApp
 
 > Nuxt.js project
 

@@ -1,25 +1,28 @@
 import axios from 'axios'
 import apiEndpoint from '../third_party_api'
 
-// export const api = {
-//   namespaced: true,
-//   state: {},
-//   mutations: {},
-//   getters: {},
-// }
 export const state = () => ({
-  shopInfo: {}
+  shopInfo: {},
+  restaurantList: {}
 })
 export const mutations = {
   setShopInfo(state, shopInfo) {
     state.shopInfo = shopInfo
-    console.log(state.shopInfo)
-  }
+  },
+  setRestaurantList(state, restaurantList) {
+    state.restaurantList = {
+      ...state.restaurantList,
+      restaurantList
+    }
+  },
 }
 export const getters = {
   getShopInfo (state) {
     return state.shopInfo
-  }
+  },
+  getRestaurantList (state) {
+    return state.restaurantList
+  },
 }
 export const actions = {
   apiRequest(context, reqData) {
@@ -34,10 +37,6 @@ export const actions = {
         req.method = apiEndpoint[reqData.api].method
       }
       req.url = apiEndpoint[reqData.api].url
-      req.headers = {
-        // 'Access-Control-Allow-Origin': '*'
-        // Authorization: localStorage.getItem('token'),
-      }
       axios(req).then(response => {
         resolve(response.data)
       }).catch((error) => {

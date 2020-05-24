@@ -2,16 +2,10 @@
   <div>
     <header>
       <h1>
-        <a href="/type">Hey there! 電源カフェ</a>
+        <a href="/">Hey there! 電源カフェ<img src="~/static/wifi-solid.svg" width="24" height="24" style="margin-left: 4px"></a>
       </h1>
       <nav class="pc-nav">
-        <select name="都市選択">
-          <option value="都市選択">選択してください</option>
-          <option value="新宿区">A型</option>
-          <option value="B">B型</option>
-          <option value="O">O型</option>
-          <option value="AB">AB型</option>
-        </select>
+        <SelectBox @select="selectCity" :options="city23"/>
       </nav>
     </header>
     <nuxt/>
@@ -21,15 +15,63 @@
 </template>
 <script>
 import Modal from '~/components/Modal.vue'
+import SelectBox from '~/components/Select.vue'
 
 export default {
   components: {
-    Modal
+    Modal,
+    SelectBox
   },
+  data() {
+    return {
+      city23: [
+        '千代田区',
+        '中央区',
+        '港区',
+        '新宿区',
+        '文京区',
+        '台東区',
+        '墨田区',
+        '江東区',
+        '品川区',
+        '目黒区',
+        '大田区',
+        '世田谷区',
+        '渋谷区',
+        '中野区',
+        '杉並区',
+        '豊島区',
+        '北区',
+        '荒川区',
+        '板橋区',
+        '練馬区',
+        '足立区',
+        '葛飾区',
+        '江戸川区'
+      ]
+    }
+  },
+  methods: {
+    selectCity(event) {
+      this.$store.dispatch('api/apiRequest', {
+        api: 'restaurantIndex',
+        params: {
+          keyid: process.env.GURUNAVI_KEY,
+          freeword: 'カフェ',
+          address: event.target.value,
+          wifi: 1
+        }
+      }).then((res) => {
+        // console.log('res', res)
+        this.$store.commit('api/setRestaurantList', res.rest)
+      })
+    }
+  }
 }
 </script>
 
 <style lang="scss">
+@import 'assets/scss/color.scss';
 html {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 16px;
@@ -47,7 +89,7 @@ html {
     header {
       width: 100%;
       padding: 30px 10% 10px;
-      background-color: #fff;
+      background-color:  $site;
       position: fixed;
       top: 0;
       z-index: 2;
@@ -76,7 +118,7 @@ html {
 }
 
 .button--green:hover {
-  color: #fff;
+  color:  $site;
   background-color: #3b8070;
 }
 
@@ -91,7 +133,7 @@ html {
 }
 
 .button--grey:hover {
-  color: #fff;
+  color:  $site;
   background-color: #35495e;
 }
 
