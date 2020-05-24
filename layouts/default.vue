@@ -56,7 +56,8 @@ export default {
       this.$store.dispatch('api/apiRequest', {
         api: 'restaurantIndex',
         params: {
-          keyid: process.env.GURUNAVI_KEY,
+          keyid: 'ee16c358353c48730bc3264ead7330a7',
+          // keyid: process.env.GURUNAVI_KEY,
           freeword: 'カフェ',
           address: event.target.value,
           wifi: 1
