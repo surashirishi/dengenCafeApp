@@ -3,7 +3,7 @@ module.exports = {
   ** Headers of the page
   */
   head: {
-    title: 'hopestore-app',
+    title: 'dengenCafeApp',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -12,6 +12,30 @@ module.exports = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
     ]
+  },
+  modules: [
+    '@nuxtjs/axios',
+    '@nuxtjs/proxy',
+    'semantic-ui-vue/nuxt',
+    ['semantic-ui-vue/nuxt', { css: false }],
+    '@nuxtjs/dotenv',
+  ],
+  axios: {
+    proxy: true
+  },
+  proxy: {
+    '/gurunavi': {
+      target: 'https://api.gnavi.co.jp',
+      pathRewrite: {
+        '^/gurunavi': ''
+      }
+    },
+    '/geo': {
+      target: 'http://geoapi.heartrails.com',
+      pathRewrite: {
+        '^/geo': ''
+      }
+    },
   },
   /*
   ** Customize the progress bar color
