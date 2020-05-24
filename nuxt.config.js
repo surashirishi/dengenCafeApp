@@ -20,6 +20,9 @@ module.exports = {
     ['semantic-ui-vue/nuxt', { css: false }],
     '@nuxtjs/dotenv',
   ],
+  env: {
+    GURUNAVI_KEY: process.env.GURUNAVI_KEY,
+  },
   axios: {
     proxy: true
   },
